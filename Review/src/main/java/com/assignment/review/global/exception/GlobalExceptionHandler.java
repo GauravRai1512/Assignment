@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.assignment.review.exceptions.ProductReviewHasAlreadyDeleted;
 import com.assignment.review.exceptions.ReviewNotReceivedServiceException;
 import com.assignment.review.model.ErrorResponse;
 import com.assignment.review.model.MoreInfo;
@@ -15,6 +16,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	
 	@ExceptionHandler({ReviewNotReceivedServiceException.class})
 	public ResponseEntity<Object> handleAllExceptions(ReviewNotReceivedServiceException ex){
+		
+		return parseBaseRuntimeException(ex, HttpStatus.NOT_FOUND);
+		
+	}
+	
+	@ExceptionHandler({ProductReviewHasAlreadyDeleted.class})
+	public ResponseEntity<Object> handleAllExceptions(ProductReviewHasAlreadyDeleted ex){
 		
 		return parseBaseRuntimeException(ex, HttpStatus.NOT_FOUND);
 		

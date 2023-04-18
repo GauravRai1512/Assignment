@@ -6,15 +6,17 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
+import com.assignment.review.exceptions.ProductReviewHasAlreadyDeleted;
 import com.assignment.review.exceptions.ReviewNotReceivedServiceException;
 import com.assignment.review.model.ProductReviewRequest;
 import com.assignment.review.model.RetrieveProductReviewResponse;
 import com.assignment.review.persistence.productreviewdb.Review;
 import com.assignment.review.repository.ReviewRepository;
 import com.assignment.review.services.ReviewService;
-import com.sun.xml.bind.v2.runtime.unmarshaller.XsiNilLoader.Single;
 
 @Service
 public class ReviewServiceImpl implements ReviewService {
@@ -23,6 +25,7 @@ public class ReviewServiceImpl implements ReviewService {
 	private ReviewRepository reviewRepository;
 
 	@SuppressWarnings("null")
+	@Retryable(value=RuntimeException.class, maxAttempts = 3, backoff = @Backoff(3000))
 	public RetrieveProductReviewResponse getProductReview(String productId){
 		// TODO Auto-generated method stub
 		RetrieveProductReviewResponse reviewResponse = new RetrieveProductReviewResponse();
@@ -39,6 +42,7 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	@Override
+	@Retryable(value=RuntimeException.class, maxAttempts = 3, backoff = @Backoff(3000))
 	public ResponseEntity<String> createProductReview(ProductReviewRequest productReviewRequest) {
 		// TODO Auto-generated method stub
 		Review productReview = new Review();
@@ -50,13 +54,21 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	@Override
+	@Retryable(value = RuntimeException.class, maxAttempts = 3, backoff = @Backoff(3000))
 	public ResponseEntity<String> deleteProductReview(String productId) {
 		// TODO Auto-generated method stub
-		reviewRepository.deleteByProductID(productId);
-		return new ResponseEntity<>("Successfuly Deleted",HttpStatus.OK);
+		Review review = reviewRepository.findReviewByProductID(productId);
+		if (review != null) {
+
+			reviewRepository.deleteByProductID(productId);
+		} else {
+			throw new ProductReviewHasAlreadyDeleted("Already deleted", "Already deleted or not available to delete");
+		}
+		return new ResponseEntity<>("Successfuly Deleted", HttpStatus.OK);
 	}
 
 	@Override
+	@Retryable(value = RuntimeException.class, maxAttempts = 3, backoff = @Backoff(3000))
 	public RetrieveProductReviewResponse updateProductReview(String productId, ProductReviewRequest productReviewRequest) {
 		// TODO Auto-generated method stub
 		RetrieveProductReviewResponse updatedProductReview = new RetrieveProductReviewResponse();
@@ -75,6 +87,7 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	@Override
+	@Retryable(value = RuntimeException.class, maxAttempts = 3, backoff = @Backoff(3000))
 	public List<RetrieveProductReviewResponse> getAllProductReview() {
 		// TODO Auto-generated method stub
 		List<RetrieveProductReviewResponse> getAllProductinList = new ArrayList<>();
