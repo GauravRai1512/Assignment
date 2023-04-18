@@ -1,5 +1,7 @@
 package com.assignment.review.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +18,6 @@ import com.assignment.review.model.ProductReviewRequest;
 import com.assignment.review.model.RetrieveProductReviewResponse;
 import com.assignment.review.services.ReviewService;
 
-import io.github.resilience4j.retry.annotation.Retry;
-
 @RestController
 @RequestMapping("/review")
 public class ProductReviewController {
@@ -26,14 +26,12 @@ public class ProductReviewController {
 	private ReviewService reviewService;
 
 	@PostMapping(value = "/create")
-	@Retry(name="postRetry", fallbackMethod = "fallbackAfterRetry")
 	public ResponseEntity<String> createProductReview(@RequestBody ProductReviewRequest productReviewRequest) {
 
 		return reviewService.createProductReview(productReviewRequest);
 	}
 
 	@GetMapping(value = "{product_id}", produces = MediaType.APPLICATION_JSON_VALUE)
-	@Retry(name="getRetry", fallbackMethod = "fallbackAfterRetry")
 	public RetrieveProductReviewResponse getProductReview(@PathVariable("product_id") String productId) {
 
 		return reviewService.getProductReview(productId);
@@ -41,21 +39,20 @@ public class ProductReviewController {
 	}
 
 	@DeleteMapping(value = "/delete/{product_id}")
-	@Retry(name="deleteRetry", fallbackMethod = "fallbackAfterRetry")
 	public ResponseEntity<String> deleteProductReview(@PathVariable("product_id") String productId) {
 		return reviewService.deleteProductReview(productId);
 
 	}
 
 	@PutMapping(value = "{product_id}", produces = MediaType.APPLICATION_JSON_VALUE)
-	@Retry(name="putRetry", fallbackMethod = "fallbackAfterRetry")
 	public RetrieveProductReviewResponse updatedProductReview(@PathVariable("product_id") String productId,
 			@RequestBody ProductReviewRequest productReviewRequest) {
 		return reviewService.updateProductReview(productId, productReviewRequest);
 	}
 	
-	public String fallbackAfterRetry(Exception e) {
-		return "There is an internal issue, will comeback shortly";
+	@GetMapping(value="/products",produces = MediaType.APPLICATION_JSON_VALUE)
+	public List<RetrieveProductReviewResponse> getAllProductReview() {
+		return reviewService.getAllProductReview();
 	}
 
 }

@@ -1,5 +1,8 @@
 package com.assignment.review.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +14,7 @@ import com.assignment.review.model.RetrieveProductReviewResponse;
 import com.assignment.review.persistence.productreviewdb.Review;
 import com.assignment.review.repository.ReviewRepository;
 import com.assignment.review.services.ReviewService;
+import com.sun.xml.bind.v2.runtime.unmarshaller.XsiNilLoader.Single;
 
 @Service
 public class ReviewServiceImpl implements ReviewService {
@@ -68,6 +72,23 @@ public class ReviewServiceImpl implements ReviewService {
 		updatedProductReview.setNumerofReviews(reviewResponse.getNumberOfReviews());
 		
 		return updatedProductReview;
+	}
+
+	@Override
+	public List<RetrieveProductReviewResponse> getAllProductReview() {
+		// TODO Auto-generated method stub
+		List<RetrieveProductReviewResponse> getAllProductinList = new ArrayList<>();
+		List<Review> updateReview = reviewRepository.findAll();
+		updateReview.stream().forEach(productReview -> {
+
+			RetrieveProductReviewResponse singleProductReview = new RetrieveProductReviewResponse();
+			singleProductReview.setProductID(productReview.getProductID());
+			singleProductReview.setAverageReviewScore(productReview.getAverageReviewScore());
+			singleProductReview.setNumerofReviews(productReview.getNumberOfReviews());
+			getAllProductinList.add(singleProductReview);
+		});
+
+		return getAllProductinList;
 	}
 
 	

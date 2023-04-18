@@ -1,5 +1,7 @@
 package com.assignment.review.services;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 
 import com.assignment.review.model.ProductReviewRequest;
@@ -11,4 +13,5 @@ public interface ReviewService {
 	ResponseEntity<String> createProductReview(ProductReviewRequest productReviewRequest);
 	ResponseEntity<String> deleteProductReview(String productId);
 	RetrieveProductReviewResponse updateProductReview(String numberOfReviews, ProductReviewRequest productReviewRequest);
+	List<RetrieveProductReviewResponse> getAllProductReview();
 }
