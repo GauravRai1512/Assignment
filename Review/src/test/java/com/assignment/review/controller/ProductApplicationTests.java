@@ -57,6 +57,13 @@ class ProductReviewControllerTest {
 		
 	}
 	
+	@Test(expected = ReviewNotReceivedServiceException.class)
+	public void testGetProductReviewException() {
+		RetrieveProductReviewResponse responseSuccess = productReviewController.getProductReview("AC78365847583497583476");
+		assertNull(responseSuccess, "response is null");
+		
+	}
+	
 	@Test
 	public void testGetAllProductReview() {
 		List<RetrieveProductReviewResponse> responseSuccess = productReviewController.getAllProductReview();
