@@ -74,5 +74,19 @@ class ProductReviewControllerTest {
 		assertNotNull(responseSuccess);
 		
 	}
+	
+	
+	@Test
+	public void testDeleteProductReview() {
+		ResponseEntity<String> responseSuccess = productReviewController.deleteProductReview("AC783656");
+		assertEquals(responseSuccess.getStatusCode(), HttpStatus.OK);
+		
+	}
+	
+	@Test(expected = ProductReviewHasAlreadyDeleted.class)
+	public void testDeleteProductReviewException() {
+		productReviewController.deleteProductReview("AC78365689798");
+		
+	}
 
 }
